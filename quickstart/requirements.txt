@@ -1,0 +1,4 @@
+python-dotenv
+graphrag_sdk[openai]
+beautifulsoup4
+requests

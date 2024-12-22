@@ -1,0 +1,37 @@
+services:
+  falkordb:
+    image: falkordb/falkordb:latest
+    ports:
+      - "6379:6379"
+      - "3000:3000"
+    volumes:
+      - falkordb_data:/data
+    networks:
+      - graphrag_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  graphrag:
+    build: .
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      falkordb:
+        condition: service_healthy
+    networks:
+      - graphrag_network
+    volumes:
+      - .:/app
+    tty: true           # Keep the container running
+    stdin_open: true    # Keep STDIN open
+    restart: unless-stopped
+
+networks:
+  graphrag_network:
+    driver: bridge
+
+volumes:
+  falkordb_data:
